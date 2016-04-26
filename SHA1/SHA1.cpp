@@ -10,11 +10,11 @@ int SHA1(char* msg, long long msg_len, unsigned char digest[])
     long long remain = msg_len % add_1st_len;
     long long msg_new_len = msg_len + add_total - remain;
     long long end_1st = msg_new_len - add_2nd_len;
-    std::vector<unsigned char> msg_new(msg_new_len);
+    std::vector<unsigned char> msg_new(static_cast<size_t>(msg_new_len));
     for (int i = 0; i < msg_len; ++i) {
         msg_new[i] = msg[i];
     }
-    msg_new[msg_len] = ADDITIONAL_1ST;
+    msg_new[static_cast<size_t>(msg_len)] = ADDITIONAL_1ST;
     const size_t size_of_long_long = sizeof(long long);
     union SeparateMsgLen {
         long long len;
@@ -24,7 +24,7 @@ int SHA1(char* msg, long long msg_len, unsigned char digest[])
     separate_msg_len.len = msg_len * BYTE_SIZE;
     for (int i = 0; i < size_of_long_long;++i) {
         long long iter = end_1st + i;
-        msg_new[iter] = separate_msg_len.byte[size_of_long_long - i - 1];
+        msg_new[static_cast<size_t>(iter)] = separate_msg_len.byte[size_of_long_long - i - 1];
     }
     typedef unsigned int SHA132BIT;
     const SHA132BIT Kt[4] = { 0x5A827999 ,0x6ED9EBA1  ,0x8F1BBCDC,0xCA62C1D6 };
@@ -100,18 +100,20 @@ int SHA1(char* msg, long long msg_len, unsigned char digest[])
     }
     return 0;
 }
+#if 0
 #include <iostream>
 #include <iomanip>
 int main(void)
 {
     char msg[] = "abc";
-    long long msg_len = sizeof(msg)-1;
+    long long msg_len = sizeof(msg) - 1;
     unsigned char digest[20];
     SHA1(msg, msg_len, digest);
     for each(auto v in digest) {
-        std::cout << std::hex << static_cast<unsigned int>(v);
+        std::cout << std::hex <<std::setw(2)<< std::setfill('0') << static_cast<unsigned int>(v);
     }
     char c;
     std::cin >> c;
     return 0;
 }
+#endif 
